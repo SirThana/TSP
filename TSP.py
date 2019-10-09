@@ -31,7 +31,9 @@ def drawLine(vectorList):
     #pdb.set_trace()
     d = calcDistance(vectorList[0], vectorList[1]) #Initialize first distance gap
     for idx1, p1 in enumerate(vectorList):
+        d = calcDistance(p1, vectorList[vectorList.index(p1) + 1])
         pg.draw.circle(screen, (0,255,255), (p1), (5)) #make current dot blue
+        pg.display.update() #refresh screen
         for idx2, p2 in enumerate(vectorList):
             if p2 != p1: #Theres one iteration where they're the same, ignore that iteration
                 if calcDistance(p1, p2) <= d: #calcDistance and compare it to the lowest found d
@@ -41,7 +43,6 @@ def drawLine(vectorList):
                 if idx2 == len(vectorList) - 1: #draw line after p1 is compared to all posible p2
                     pg.draw.line(screen, (30,120,10), (p1), (vectorList[idxLowVal]), 2)
                     print(vectorList.index(p1))
-                    time.sleep(1)
                     pg.display.update() #refresh screen
 
 
@@ -50,11 +51,11 @@ def drawLine(vectorList):
 
 
 def main():
-    (width, height) = (800, 500)
+    (width, height) = (1920, 1080)
     global screen #Superscope screen
 
     screen = pg.display.set_mode((width, height))
-    vectorList = vectorGenerator(6, width, height)
+    vectorList = vectorGenerator(400, width, height)
     for vector in vectorList:
         pg.draw.circle(screen, (255,0,0), (vector), (5))
 
