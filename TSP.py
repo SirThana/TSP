@@ -28,12 +28,14 @@ def calcDistance(p1, p2):
 
 
 def drawLine(vectorList):
-    #pdb.set_trace()
-    d = calcDistance(vectorList[0], vectorList[1]) #Initialize first distance gap
     for idx1, p1 in enumerate(vectorList):
-        d = calcDistance(p1, vectorList[vectorList.index(p1) + 1])
+        try:
+            d = calcDistance(p1, vectorList[vectorList.index(p1) + 1])
+        except Exception as e:
+            pass
         pg.draw.circle(screen, (0,255,255), (p1), (5)) #make current dot blue
         pg.display.update() #refresh screen
+
         for idx2, p2 in enumerate(vectorList):
             if p2 != p1: #Theres one iteration where they're the same, ignore that iteration
                 if calcDistance(p1, p2) <= d: #calcDistance and compare it to the lowest found d
