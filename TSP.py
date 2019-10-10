@@ -1,5 +1,6 @@
 import time
 import pdb
+from pudb.remote import set_trace
 import pygame as pg
 import random
 import math
@@ -28,28 +29,36 @@ def calcDistance(p1, p2):
 
 
 def drawLine(vectorList):
-    for idx1, p1 in enumerate(vectorList):
-        try:
-            d = calcDistance(p1, vectorList[vectorList.index(p1) + 1])
-        except Exception as e:
-            pass
-        pg.draw.circle(screen, (0,255,255), (p1), (5)) #make current dot blue
-        pg.display.update() #refresh screen
+    knownPoints = [] #Keep track of known points index
+    for idx1 in range(0, len(vectorList) - 1):
+        if idx1 not in knownPoints:
+            if idx1 > 0:
+                idx1 = vectorList.index(vectorList[idxLowVal])
+            if idx1 <= len(vectorList) - 1:
+                try:
+                    d = calcDistance(vectorList[idx1], vectorList[idx1 + 1])
+                except:
+                    d = calcDistance(vectorList[idx1], vectorList[idx1])
+                
+            pg.draw.circle(screen, (0,255,255), (vectorList[idx1]), (5)) #make current dot blue
+            pg.display.update() #refresh screen
 
-        for idx2, p2 in enumerate(vectorList):
-            if p2 != p1: #Theres one iteration where they're the same, ignore that iteration
-                if calcDistance(p1, p2) <= d: #calcDistance and compare it to the lowest found d
-                    d = calcDistance(p1, p2) #Not even neccesary right ?? | for comparison
-                    idxLowVal = idx2 #Found a new lowest val, update the index
+            #Compare idx1 against all other p2's
+            for idx2, p2 in enumerate(vectorList):
+                while idx2 in knownPoints:
+                    idx2 += 1
+                if p2 != vectorList[idx1]: #Theres one iteration where they're the same, ignore that iteration
+                    if calcDistance(vectorList[idx1], p2) <= d: #calcDistance and compare it to the lowest found d
+                        d = calcDistance(vectorList[idx1], p2) #Not even neccesary right ?? | for comparison
+                        idxLowVal = idx2 #Found a new lowest val, update the index
 
-                if idx2 == len(vectorList) - 1: #draw line after p1 is compared to all posible p2
-                    pg.draw.line(screen, (30,120,10), (p1), (vectorList[idxLowVal]), 2)
-                    print(vectorList.index(p1))
-                    pg.display.update() #refresh screen
-
-
-
-
+                    #We compared idx1 to all p2's, we can now draw shortest line
+                    if idx2 == len(vectorList) - 1:
+                        knownPoints.append(idxLowVal)
+                        knownPoints.append(idx1)
+                        pg.draw.line(screen, (30,120,10), (vectorList[idx1]), (vectorList[idxLowVal]), 2)
+                        print(vectorList.index(vectorList[idx1]))
+                        pg.display.update() #refresh screen
 
 
 def main():
@@ -57,10 +66,10 @@ def main():
     global screen #Superscope screen
 
     screen = pg.display.set_mode((width, height))
-    vectorList = vectorGenerator(400, width, height)
+    vectorList = vectorGenerator(6, width, height)
     for vector in vectorList:
         pg.draw.circle(screen, (255,0,0), (vector), (5))
-
+    #set_trace()
     drawLine(vectorList)
     pg.display.flip()
 
